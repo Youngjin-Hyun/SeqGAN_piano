@@ -17,6 +17,21 @@ class preprocessing(object):
     def __init__(self):
         self.chords = []
         self.chord_octaves = []
+        self.chord_ref = [[0, 4, 7], [2, 7, 11], [2, 5, 10], [0, 5, 9], [3, 7, 10], [0, 5, 8], [1, 5, 10], [2, 5, 9], [0, 4, 9],
+         [2, 7, 10], [2, 11], [0, 4], [2, 5], [0, 4, 7, 10], [2, 6, 9], [4, 7], [0, 5], [5, 11], [5, 9], [2, 4], [5, 7],
+         [0, 3, 7], [0, 2, 6, 9], [1, 4, 7, 9], [2, 5, 7, 11], [1, 4, 7], [1, 5, 8], [1, 4, 9], [4, 8, 11], [7, 11],
+         [0, 9], [4, 8], [0, 7, 9], [2, 7], [4, 7, 11], [3, 6, 11], [0, 3], [3, 7], [5, 8], [2, 10], [7, 10], [0, 8],
+         [5, 10], [0, 3, 8], [2, 5, 8, 10], [2, 5, 11], [0, 2, 5, 8], [3, 6, 10], [0, 3, 5, 9], [6, 9], [2, 4, 8, 11],
+         [5, 8, 11], [0, 2, 5, 9], [1, 6], [5, 7, 11], [4, 7, 9], [1, 3, 7, 10], [0, 4, 7, 9], [0, 6, 9], [2, 5, 7, 10],
+         [1, 6, 10], [1, 4, 6, 10], [3, 6, 9, 11], [2, 6, 11], [0, 7], [0, 3, 6, 8], [1, 6, 9], [3, 6], [3, 10],
+         [0, 3, 5, 8], [0, 2], [2], [3, 9], [3], [0, 3, 6]]
+        self.octave_ref = [[3, 3, 3], [2, 3, 2], [3, 2, 3], [3, 4, 3], [4, 3, 4], [5, 4], [5, 5], [3, 3, 3, 3], [4, 4], [3, 3, 4, 3],
+         [4, 3, 4, 4], [4, 4, 3, 3], [4, 3], [4, 4, 4], [2, 2, 2], [3, 3, 2, 2], [4, 5], [4, 4, 4, 4], [3, 2, 3, 3],
+         [2, 2], [3, 3], [3, 4, 4], [4, 3, 3], [4, 4, 3], [2, 3, 3], [4, 4, 4, 3], [4, 5, 4], [5, 4, 4, 4],
+         [2, 2, 3, 2], [3, 4, 3, 4]]
+
+        self.chords_cnt = [0] * len(self.chord_ref)
+        self.chord_octaves_cnt = [0] * len(self.octave_ref)
 
     def streaming(self, part, event, part_tuples):
         # save start time
@@ -32,10 +47,18 @@ class preprocessing(object):
             # save index for sorting pitches of chord
             sort_idx = [i[0] for i in sorted(enumerate(event.pitchClasses), key=lambda x: x[1])]
             octaves = [x for (y, x) in sorted(zip(sort_idx, octaves))]
+
+            ch_idx = self.chord_ref.index(event.orderedPitchClasses)
+            oc_idx = self.octave_ref.index(octaves)
+            self.chords_cnt[ch_idx] += 1
+            self.chord_octaves_cnt[oc_idx] += 1
+            """
             if event.orderedPitchClasses not in self.chords:
                 self.chords.append(event.orderedPitchClasses)
             if octaves not in self.chord_octaves:
                 self.chord_octaves.append(octaves)
+
+            """
 
             for note in event._notes:
                 part_tuples.append([offset, note.quarterLength, note.pitch.octave, note.pitch.name, note.volume.velocity])
@@ -85,8 +108,12 @@ if __name__ == "__main__":
     for file in os.listdir('./Nottingham/all'):
         all_parts = a.parsing('./Nottingham/all/'+file)
         print(file)
+        print('chords_cnt: ', a.chords_cnt)
+        print('octaves_cnt: ', a.chord_octaves_cnt)
+        """
         print(a.chords)
         print(a.chord_octaves)
         print('len(chords): ',len(a.chords))
         print('len(chord_octaves): ',len(a.chord_octaves))
+        """
         print('\n')
