@@ -114,9 +114,8 @@ class preprocessing(object):
         return sequence
 
     def compare_parts(self, all_parts):
-        if len(all_parts) != 2:
-            print('')
-            #raise ValueError('the number of parts is not two!')
+        if len(all_parts) < 2:
+            raise ValueError('the number of parts is less than two!')
         melody = all_parts[0]
         chord = all_parts[1]
         while 1:
